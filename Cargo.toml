@@ -1,0 +1,18 @@
+[package]
+name = "stow"
+description = "Cloud storage abstraction package for Rust "
+version = "0.1.0"
+authors = ["Robert Schütte <schuetterobert@gmail.com>"]
+edition = "2018"
+license-file = "LICENSE"
+repository = "https://github.com/Roba1993/stow"
+homepage = "https://github.com/Roba1993/stow"
+documentation = "https://docs.rs/stow"
+readme = "README.md"
+keywords = ["cloud", "file", "store", "google"]
+categories = ["api-bindings", "asynchronous", "filesystem"]
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
