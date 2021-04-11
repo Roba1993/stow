@@ -2,7 +2,12 @@ use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 #[tokio::test]
 async fn test_local() -> stow::Result<()> {
-    dotenv::dotenv().unwrap();
+    if let Err(e) = dotenv::dotenv() {
+        if !e.not_found() {
+            let e: Result<(), dotenv::Error> = Err(e);
+            e.unwrap();
+        }
+    }
 
     let project = std::env::var("STOW_TEST_GCP_PROJECT")?;
     let path = std::env::var("STOW_TEST_GCP_ACCESS_PATH")?;

@@ -16,10 +16,11 @@ version = "0.2.0"
 
 [dependencies]
 async-trait = "0.1.48"
-dotenv = "0.15.0"
-futures = "0.3.14"
 #google-cloud = {version = "0.2.1", features = ["storage"]} // lets wait for the merge
 google-cloud = {features = ["storage"], git = "https://github.com/Roba1993/google-cloud-rs", branch = "list-objects"}
 regex = "1"
 thiserror = "1"
 tokio = {version = "1", features = ["fs", "io-util", "rt", "macros"]}
+
+[dev-dependencies]
+dotenv = "0.15.0"
