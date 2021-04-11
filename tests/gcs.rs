@@ -61,12 +61,8 @@ async fn test_local() -> stow::Result<()> {
     assert_eq!(&b"Hello World 1 New"[0..], &buf);
 
     // remove the item.txt in container 2
-    gcs.remove_item(&container_2, "test.txt")
-        .await?;
-    assert!(gcs
-        .read_item(&container_2, "test.txt")
-        .await
-        .is_err());
+    gcs.remove_item(&container_2, "test.txt").await?;
+    assert!(gcs.read_item(&container_2, "test.txt").await.is_err());
 
     println!("delete");
 
@@ -74,12 +70,8 @@ async fn test_local() -> stow::Result<()> {
     gcs.remove_container(&container_2).await?;
 
     // remove the item.txt in container 1
-    gcs.remove_item(&container_1, "test.txt")
-        .await?;
-    assert!(gcs
-        .read_item(&container_1, "test.txt")
-        .await
-        .is_err());
+    gcs.remove_item(&container_1, "test.txt").await?;
+    assert!(gcs.read_item(&container_1, "test.txt").await.is_err());
     gcs.remove_container(&container_1).await?;
 
     Ok(())
