@@ -3,11 +3,11 @@ Cloud storage abstraction package for Rust
 
 ## Implementations
 
-Planned implementations for now:
+Supported endpoints:
 * Local (folders are containers, files are items)
 * Google Cloud Storage
 
-Additional implementations can be added if needed.
+Additional endpoints can be added if needed.
 
 ## Concepts
 
