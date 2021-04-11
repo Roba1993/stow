@@ -18,6 +18,11 @@ jobs:
     - name: "📃 Checkout the code"
       uses: actions/checkout@v2
       
+    - name: "Create GCP Access Json"
+      run: 'echo "$GCP_ACCESS_JSON" > auth.json'
+      env:
+        GCP_ACCESS_JSON: ${{secrets.GCP_ACCESS_JSON}}
+      
     - name: "💾 Cache rust"
       uses: Swatinem/rust-cache@v1
       
@@ -32,3 +37,8 @@ jobs:
       
     - name: ❔ Run tests
       run: cargo test --verbose
+      env:
+        STOW_TEST_GCP_ACCESS_PATH: auth.json
+        STOW_TEST_GCP_PROJECT: ${{secrets.STOW_TEST_GCP_PROJECT}}
+        STOW_TEST_GCP_CONTAINER_1: ${{secrets.STOW_TEST_GCP_CONTAINER_1}}
+        STOW_TEST_GCP_CONTAINER_2: ${{secrets.STOW_TEST_GCP_CONTAINER_2}}
