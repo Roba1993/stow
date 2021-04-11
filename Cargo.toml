@@ -16,6 +16,10 @@ version = "0.2.0"
 
 [dependencies]
 async-trait = "0.1.48"
+#google-cloud = {version = "0.2.1", features = ["storage"]}
+futures = "0.3.14"
+google-cloud = {path = "../google-cloud-rs/google-cloud", features = ["storage"]}
 regex = "1"
 thiserror = "1"
 tokio = {version = "1", features = ["fs", "io-util", "rt", "macros"]}
+dotenv = "0.15.0"

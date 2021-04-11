@@ -17,7 +17,7 @@ impl LocalLocation {
 
 #[async_trait::async_trait(?Send)]
 impl Adapter for LocalLocation {
-    async fn containers(&self) -> Result<Vec<String>> {
+    async fn containers(&mut self) -> Result<Vec<String>> {
         let mut res = tokio::fs::read_dir(&self.path).await?;
         let mut containers = vec![];
 
@@ -30,7 +30,7 @@ impl Adapter for LocalLocation {
         Ok(containers)
     }
 
-    async fn create_container(&self, container: &str) -> Result<()> {
+    async fn create_container(&mut self, container: &str) -> Result<()> {
         let mut path = self.path.clone();
         path.push('/');
         path.push_str(&util::streamline(container));
@@ -44,7 +44,7 @@ impl Adapter for LocalLocation {
         Ok(())
     }
 
-    async fn remove_container(&self, container: &str) -> Result<()> {
+    async fn remove_container(&mut self, container: &str) -> Result<()> {
         let mut path = self.path.clone();
         path.push('/');
         path.push_str(&util::streamline(container));
@@ -53,7 +53,7 @@ impl Adapter for LocalLocation {
         Ok(())
     }
 
-    async fn items(&self, container: &str) -> Result<Vec<String>> {
+    async fn items(&mut self, container: &str) -> Result<Vec<String>> {
         let container = util::streamline(container);
         let mut path = String::from(&self.path);
         path.push('/');
@@ -72,7 +72,7 @@ impl Adapter for LocalLocation {
     }
 
     async fn create_item(
-        &self,
+        &mut self,
         container: &str,
         item: &str,
         reader: &mut (impl tokio::io::AsyncRead + Unpin),
@@ -93,7 +93,7 @@ impl Adapter for LocalLocation {
     }
 
     async fn read_item(
-        &self,
+        &mut self,
         container: &str,
         item: &str,
     ) -> Result<Box<dyn tokio::io::AsyncRead + Unpin>> {
@@ -110,7 +110,7 @@ impl Adapter for LocalLocation {
         Ok(Box::new(file))
     }
 
-    async fn remove_item(&self, container: &str, item: &str) -> Result<()> {
+    async fn remove_item(&mut self, container: &str, item: &str) -> Result<()> {
         let container = util::streamline(container);
         let item = util::streamline_item(item)?;
 

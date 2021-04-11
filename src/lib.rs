@@ -1,89 +1,106 @@
 mod error;
+mod gcs;
 mod local;
 
 pub use error::*;
+pub use gcs::*;
 pub use local::*;
 
 #[async_trait::async_trait(?Send)]
 pub trait Adapter: Clone {
-    async fn containers(&self) -> Result<Vec<String>>;
-    async fn create_container(&self, container: &str) -> Result<()>;
-    async fn remove_container(&self, container: &str) -> Result<()>;
+    async fn containers(&mut self) -> Result<Vec<String>>;
+    async fn create_container(&mut self, container: &str) -> Result<()>;
+    async fn remove_container(&mut self, container: &str) -> Result<()>;
 
-    async fn items(&self, container: &str) -> Result<Vec<String>>;
+    async fn items(&mut self, container: &str) -> Result<Vec<String>>;
     async fn create_item(
-        &self,
+        &mut self,
         container: &str,
         item: &str,
         reader: &mut (impl tokio::io::AsyncRead + Unpin),
     ) -> Result<()>;
     async fn read_item(
-        &self,
+        &mut self,
         container: &str,
         item: &str,
     ) -> Result<Box<dyn tokio::io::AsyncRead + Unpin>>;
-    async fn remove_item(&self, container: &str, item: &str) -> Result<()>;
+    async fn remove_item(&mut self, container: &str, item: &str) -> Result<()>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub enum Location {
     Local(LocalLocation),
+    Gcs(Gcs),
 }
 
 impl Location {
-    /// Create a new local Location with the given path
+    /// Create a new local location with the given path
     pub async fn new_local(path: &str) -> Result<Self> {
         Ok(Location::Local(LocalLocation::new(path).await?))
     }
 
-    pub async fn containers(&self) -> Result<Vec<String>> {
+    /// Create a new gcs location with the given project
+    /// The google service account details need to be stored in the json file.
+    /// The path to the json file, need to be set as path
+    pub async fn new_gcs(project: &str, path: &str) -> Result<Self> {
+        Ok(Location::Gcs(Gcs::new(project, path).await?))
+    }
+
+    pub async fn containers(&mut self) -> Result<Vec<String>> {
         match self {
             Location::Local(l) => l.containers().await,
+            Location::Gcs(l) => l.containers().await,
         }
     }
 
-    pub async fn create_container(&self, container: &str) -> Result<()> {
+    pub async fn create_container(&mut self, container: &str) -> Result<()> {
         match self {
             Location::Local(l) => l.create_container(container).await,
+            Location::Gcs(l) => l.create_container(container).await,
         }
     }
 
-    pub async fn remove_container(&self, container: &str) -> Result<()> {
+    pub async fn remove_container(&mut self, container: &str) -> Result<()> {
         match self {
             Location::Local(l) => l.remove_container(container).await,
+            Location::Gcs(l) => l.remove_container(container).await,
         }
     }
 
-    pub async fn items(&self, container: &str) -> Result<Vec<String>> {
+    pub async fn items(&mut self, container: &str) -> Result<Vec<String>> {
         match self {
             Location::Local(l) => l.items(container).await,
+            Location::Gcs(l) => l.items(container).await,
         }
     }
 
     pub async fn create_item(
-        &self,
+        &mut self,
         container: &str,
         item: &str,
         reader: &mut (impl tokio::io::AsyncRead + Unpin),
     ) -> Result<()> {
         match self {
             Location::Local(l) => l.create_item(container, item, reader).await,
+            Location::Gcs(l) => l.create_item(container, item, reader).await,
         }
     }
 
     pub async fn read_item(
-        &self,
+        &mut self,
         container: &str,
         item: &str,
     ) -> Result<Box<dyn tokio::io::AsyncRead + Unpin>> {
         match self {
             Location::Local(l) => l.read_item(container, item).await,
+            Location::Gcs(l) => l.read_item(container, item).await,
         }
     }
 
-    pub async fn remove_item(&self, container: &str, item: &str) -> Result<()> {
+    pub async fn remove_item(&mut self, container: &str, item: &str) -> Result<()> {
         match self {
             Location::Local(l) => l.remove_item(container, item).await,
+            Location::Gcs(l) => l.remove_item(container, item).await,
         }
     }
 }

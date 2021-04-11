@@ -11,5 +11,9 @@ Cargo.lock
 
 
 # Added by cargo
-
 /target
+
+
+# Data folder for tests
+/data
+.env

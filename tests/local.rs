@@ -3,7 +3,7 @@ use tokio::io::{AsyncReadExt, AsyncWriteExt};
 #[tokio::test]
 async fn test_local() -> stow::Result<()> {
     // create a new environment if not avilable
-    let local = stow::Location::new_local("./data").await?;
+    let mut local = stow::Location::new_local("./data").await?;
 
     // create new containers if not avilable
     local.create_container("container_1").await?;
