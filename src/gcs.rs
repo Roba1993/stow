@@ -90,9 +90,7 @@ impl Adapter for Gcs {
         let mut bucket = self.client.bucket(&container).await?;
         let mut object = bucket.object(&item).await?;
 
-        let content = object.get().await?;
-
-        Ok(Box::new(std::io::Cursor::new(content)))
+        Ok(Box::new(object.reader().await?))
     }
 
     async fn remove_item(&mut self, container: &str, item: &str) -> Result<()> {
