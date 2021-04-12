@@ -26,6 +26,8 @@ jobs:
     - name: "💾 Cache rust"
       uses: Swatinem/rust-cache@v1
       
+    - run: cargo update
+      
     - name: "📏 Rust format check"
       run: cargo fmt --all -- --check
 
