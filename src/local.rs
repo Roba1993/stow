@@ -15,7 +15,7 @@ impl LocalLocation {
     }
 }
 
-#[async_trait::async_trait(?Send)]
+#[async_trait::async_trait]
 impl Adapter for LocalLocation {
     async fn containers(&mut self) -> Result<Vec<String>> {
         let mut res = tokio::fs::read_dir(&self.path).await?;
@@ -71,11 +71,11 @@ impl Adapter for LocalLocation {
         Ok(containers)
     }
 
-    async fn create_item(
+    async fn create_item<'a>(
         &mut self,
         container: &str,
         item: &str,
-        reader: &mut (impl tokio::io::AsyncRead + Unpin),
+        mut reader: impl 'a + tokio::io::AsyncRead + Unpin + Send,
     ) -> Result<()> {
         let container = util::streamline(container);
         let item = util::streamline_item(item)?;
@@ -87,7 +87,7 @@ impl Adapter for LocalLocation {
         path.push_str(&item);
 
         let mut file = tokio::fs::File::create(path).await?;
-        tokio::io::copy(reader, &mut file).await?;
+        tokio::io::copy(&mut reader, &mut file).await?;
 
         Ok(())
     }

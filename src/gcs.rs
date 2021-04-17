@@ -15,7 +15,7 @@ impl Gcs {
     }
 }
 
-#[async_trait::async_trait(?Send)]
+#[async_trait::async_trait]
 impl Adapter for Gcs {
     async fn containers(&mut self) -> Result<Vec<String>> {
         Ok(self
@@ -56,11 +56,11 @@ impl Adapter for Gcs {
             .collect())
     }
 
-    async fn create_item(
+    async fn create_item<'a>(
         &mut self,
         container: &str,
         item: &str,
-        reader: &mut (impl tokio::io::AsyncRead + Unpin),
+        mut reader: impl 'a + tokio::io::AsyncRead + Unpin + Send,
     ) -> Result<()> {
         use tokio::io::AsyncReadExt;
 

@@ -6,18 +6,18 @@ pub use error::*;
 pub use gcs::*;
 pub use local::*;
 
-#[async_trait::async_trait(?Send)]
+#[async_trait::async_trait]
 pub trait Adapter: Clone {
     async fn containers(&mut self) -> Result<Vec<String>>;
     async fn create_container(&mut self, container: &str) -> Result<()>;
     async fn remove_container(&mut self, container: &str) -> Result<()>;
 
     async fn items(&mut self, container: &str) -> Result<Vec<String>>;
-    async fn create_item(
+    async fn create_item<'a>(
         &mut self,
         container: &str,
         item: &str,
-        reader: &mut (impl tokio::io::AsyncRead + Unpin),
+        reader: (impl 'a + tokio::io::AsyncRead + Unpin + Send),
     ) -> Result<()>;
     async fn read_item(
         &mut self,
@@ -78,7 +78,7 @@ impl Location {
         &mut self,
         container: &str,
         item: &str,
-        reader: &mut (impl tokio::io::AsyncRead + Unpin),
+        reader: (impl tokio::io::AsyncRead + Unpin + Send),
     ) -> Result<()> {
         match self {
             Location::Local(l) => l.create_item(container, item, reader).await,
