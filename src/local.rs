@@ -96,7 +96,7 @@ impl Adapter for LocalLocation {
         &mut self,
         container: &str,
         item: &str,
-    ) -> Result<Box<dyn tokio::io::AsyncRead + Unpin>> {
+    ) -> Result<Box<dyn tokio::io::AsyncRead + Unpin + Send>> {
         let container = util::streamline(container);
         let item = util::streamline_item(item)?;
 

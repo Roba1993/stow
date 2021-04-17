@@ -23,7 +23,7 @@ pub trait Adapter: Clone {
         &mut self,
         container: &str,
         item: &str,
-    ) -> Result<Box<dyn tokio::io::AsyncRead + Unpin>>;
+    ) -> Result<Box<dyn tokio::io::AsyncRead + Unpin + Send>>;
     async fn remove_item(&mut self, container: &str, item: &str) -> Result<()>;
 }
 
@@ -90,7 +90,7 @@ impl Location {
         &mut self,
         container: &str,
         item: &str,
-    ) -> Result<Box<dyn tokio::io::AsyncRead + Unpin>> {
+    ) -> Result<Box<dyn tokio::io::AsyncRead + Unpin + Send>> {
         match self {
             Location::Local(l) => l.read_item(container, item).await,
             Location::Gcs(l) => l.read_item(container, item).await,
