@@ -1,12 +1,12 @@
-mod s3;
 mod error;
 mod gcs;
 mod local;
+mod s3;
 
-pub use s3::*;
 pub use error::*;
 pub use gcs::*;
 pub use local::*;
+pub use s3::*;
 
 #[async_trait::async_trait]
 pub trait Adapter: Clone {
@@ -51,9 +51,7 @@ impl Location {
 
     /// Create a new S3 location with the given region and credentials
     pub async fn new_s3(region: &str, access_key: &str, secret_key: &str) -> Result<Self> {
-        Ok(Location::S3(
-            S3::new(region, access_key, secret_key).await?,
-        ))
+        Ok(Location::S3(S3::new(region, access_key, secret_key).await?))
     }
 
     pub async fn containers(&mut self) -> Result<Vec<String>> {

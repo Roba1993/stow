@@ -58,32 +58,32 @@ impl Adapter for S3 {
         Ok(())
     }
 
-    async fn remove_container(&mut self, container: &str) -> Result<()> {
+    async fn remove_container(&mut self, _container: &str) -> Result<()> {
         todo!();
     }
 
-    async fn items(&mut self, container: &str) -> Result<Vec<String>> {
+    async fn items(&mut self, _container: &str) -> Result<Vec<String>> {
         todo!();
     }
 
     async fn create_item<'a>(
         &mut self,
-        container: &str,
-        item: &str,
-        mut reader: impl 'a + tokio::io::AsyncRead + Unpin + Send,
+        _container: &str,
+        _item: &str,
+        mut _reader: impl 'a + tokio::io::AsyncRead + Unpin + Send,
     ) -> Result<()> {
         todo!();
     }
 
     async fn read_item(
         &mut self,
-        container: &str,
-        item: &str,
+        _container: &str,
+        _item: &str,
     ) -> Result<Box<dyn tokio::io::AsyncRead + Unpin + Send + Sync>> {
         todo!();
     }
 
-    async fn remove_item(&mut self, container: &str, item: &str) -> Result<()> {
+    async fn remove_item(&mut self, _container: &str, _item: &str) -> Result<()> {
         todo!();
     }
 }

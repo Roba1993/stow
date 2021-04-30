@@ -1,4 +1,4 @@
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
+//use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 #[tokio::test]
 async fn test_s3() -> stow::Result<()> {
@@ -21,9 +21,7 @@ async fn test_s3() -> stow::Result<()> {
     aws3.create_container(&container_1).await?;
     aws3.create_container(&container_2).await?;
 
-    return Ok(());
-
-    // https://github.com/durch/rust-s3/issues/173
+    /*
     assert!(aws3
         .containers()
         .await?
@@ -32,7 +30,6 @@ async fn test_s3() -> stow::Result<()> {
         .containers()
         .await?
         .contains(&String::from(&container_2)));
-
 
     // create two test.txt file
     aws3.create_item(
@@ -82,13 +79,7 @@ async fn test_s3() -> stow::Result<()> {
     aws3.remove_item(&container_1, "test.txt").await?;
     assert!(aws3.read_item(&container_1, "test.txt").await.is_err());
     aws3.remove_container(&container_1).await?;
+    */
 
     Ok(())
-}
-
-async fn reader(data: &str) -> stow::Result<tokio::io::DuplexStream> {
-    let (mut send, recv) = tokio::io::duplex(data.len());
-    send.write_all(data.as_bytes()).await?;
-    send.shutdown().await?;
-    Ok(recv)
 }
