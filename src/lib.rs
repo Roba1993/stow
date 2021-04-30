@@ -1,7 +1,9 @@
+mod s3;
 mod error;
 mod gcs;
 mod local;
 
+pub use s3::*;
 pub use error::*;
 pub use gcs::*;
 pub use local::*;
@@ -31,6 +33,7 @@ pub trait Adapter: Clone {
 pub enum Location {
     Local(LocalLocation),
     Gcs(Gcs),
+    S3(S3),
 }
 
 impl Location {
@@ -46,17 +49,28 @@ impl Location {
         Ok(Location::Gcs(Gcs::new(project, path).await?))
     }
 
+    /// Create a new S3 location with the given region and credentials
+    pub async fn new_s3(region: &str, access_key: &str, secret_key: &str) -> Result<Self> {
+        Ok(Location::S3(
+            S3::new(region, access_key, secret_key).await?,
+        ))
+    }
+
     pub async fn containers(&mut self) -> Result<Vec<String>> {
         match self {
             Location::Local(l) => l.containers().await,
             Location::Gcs(l) => l.containers().await,
+            Location::S3(l) => l.containers().await,
         }
     }
 
     pub async fn create_container(&mut self, container: &str) -> Result<()> {
+        let container = util::streamline(&container);
+
         match self {
-            Location::Local(l) => l.create_container(container).await,
-            Location::Gcs(l) => l.create_container(container).await,
+            Location::Local(l) => l.create_container(&container).await,
+            Location::Gcs(l) => l.create_container(&container).await,
+            Location::S3(l) => l.create_container(&container).await,
         }
     }
 
@@ -64,6 +78,7 @@ impl Location {
         match self {
             Location::Local(l) => l.remove_container(container).await,
             Location::Gcs(l) => l.remove_container(container).await,
+            Location::S3(l) => l.remove_container(container).await,
         }
     }
 
@@ -71,6 +86,7 @@ impl Location {
         match self {
             Location::Local(l) => l.items(container).await,
             Location::Gcs(l) => l.items(container).await,
+            Location::S3(l) => l.items(container).await,
         }
     }
 
@@ -83,6 +99,7 @@ impl Location {
         match self {
             Location::Local(l) => l.create_item(container, item, reader).await,
             Location::Gcs(l) => l.create_item(container, item, reader).await,
+            Location::S3(l) => l.create_item(container, item, reader).await,
         }
     }
 
@@ -94,6 +111,7 @@ impl Location {
         match self {
             Location::Local(l) => l.read_item(container, item).await,
             Location::Gcs(l) => l.read_item(container, item).await,
+            Location::S3(l) => l.read_item(container, item).await,
         }
     }
 
@@ -101,6 +119,7 @@ impl Location {
         match self {
             Location::Local(l) => l.remove_item(container, item).await,
             Location::Gcs(l) => l.remove_item(container, item).await,
+            Location::S3(l) => l.remove_item(container, item).await,
         }
     }
 }
@@ -110,9 +129,9 @@ mod util {
 
     pub fn streamline(input: &str) -> String {
         // reformat the name
-        let reg = regex::Regex::new("[^a-z0-9_]").unwrap();
+        let reg = regex::Regex::new("[^a-z0-9\\-]").unwrap();
         let mut res = reg.replace_all(input.to_lowercase().trim(), "").to_string();
-        if res.starts_with('_') {
+        if res.starts_with('-') {
             res.remove(0);
         }
         res
@@ -125,9 +144,9 @@ mod util {
         let (base, typ) = input.split_at(pos);
 
         // reformat the name
-        let reg = regex::Regex::new("[^a-z0-9_]").unwrap();
+        let reg = regex::Regex::new("[^a-z0-9\\-]").unwrap();
         let mut res = reg.replace_all(base.to_lowercase().trim(), "").to_string();
-        if res.starts_with('_') {
+        if res.starts_with('-') {
             res.remove(0);
         }
 

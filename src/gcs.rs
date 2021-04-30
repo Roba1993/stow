@@ -28,8 +28,6 @@ impl Adapter for Gcs {
     }
 
     async fn create_container(&mut self, container: &str) -> Result<()> {
-        let container = util::streamline(container);
-
         // only create bucket if not avialble
         if self.client.bucket(&container).await.is_err() {
             self.client

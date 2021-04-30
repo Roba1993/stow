@@ -33,7 +33,7 @@ impl Adapter for LocalLocation {
     async fn create_container(&mut self, container: &str) -> Result<()> {
         let mut path = self.path.clone();
         path.push('/');
-        path.push_str(&util::streamline(container));
+        path.push_str(container);
 
         if let Err(e) = tokio::fs::create_dir(path).await {
             if e.kind() != std::io::ErrorKind::AlreadyExists {
