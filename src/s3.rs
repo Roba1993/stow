@@ -71,51 +71,117 @@ impl Adapter for S3 {
         Ok(())
     }
 
-    async fn remove_container(&mut self, _container: &str) -> Result<()> {
-        todo!();
+    async fn remove_container(&mut self, container: &str) -> Result<()> {
+        let client = self.create_client()?;
+
+        let req = rusoto_s3::DeleteBucketRequest {
+            bucket: container.to_string(),
+            ..Default::default()
+        };
+
+        rusoto_s3::S3::delete_bucket(&client, req).await?;
+        Ok(())
     }
 
-    async fn items(&mut self, _container: &str) -> Result<Vec<String>> {
-        todo!();
+    async fn items(&mut self, container: &str) -> Result<Vec<String>> {
+        let client = self.create_client()?;
+
+        // inital request
+        let mut req = rusoto_s3::ListObjectsV2Request {
+            bucket: container.to_string(),
+            ..Default::default()
+        };
+
+        // response
+        let mut res = rusoto_s3::S3::list_objects_v2(&client, req).await?;
+
+        // format to string keys
+        let mut items = vec![];
+        if let Some(l) = res.contents {
+            l.iter()
+                .filter_map(|o| o.key.clone())
+                .for_each(|o| items.push(o));
+        }
+
+        // repeat request as long continuation tokens are available
+        while let Some(ct) = res.continuation_token {
+            req = rusoto_s3::ListObjectsV2Request {
+                bucket: container.to_string(),
+                continuation_token: Some(ct),
+                ..Default::default()
+            };
+
+            res = rusoto_s3::S3::list_objects_v2(&client, req).await?;
+            if let Some(l) = res.contents {
+                l.iter()
+                    .filter_map(|o| o.key.clone())
+                    .for_each(|o| items.push(o));
+            }
+        }
+
+        Ok(items)
     }
 
-    async fn create_item<'a>(
+    async fn create_item(
         &mut self,
-        _container: &str,
-        _item: &str,
-        mut _reader: impl 'a + tokio::io::AsyncRead + Unpin + Send + Sync,
+        container: &str,
+        item: &str,
+        mut reader: impl tokio::io::AsyncRead + Unpin + Send + Sync + 'static,
     ) -> Result<()> {
-        // convert the tokio async read to futures stream
-        /*
-        use futures::TryStreamExt;
-        let stream =
-            tokio_util::codec::FramedRead::new(reader, tokio_util::codec::BytesCodec::new())
-                .map_ok(|bytes| bytes.freeze());
+        use tokio::io::AsyncReadExt;
+
+        let client = self.create_client()?;
+
+        // read the full file into memory to have the content-length
+        // todo: this needs to be improved
+        let mut data = vec![];
+        reader.read_to_end(&mut data).await?;
 
         // create rusoto byte stream
-        let stream = rusoto_s3::StreamingBody::new(stream);
+        let size = data.len() as i64;
+        let stream = rusoto_s3::StreamingBody::from(data);
 
         let req = rusoto_s3::PutObjectRequest {
             bucket: container.to_string(),
             body: Some(stream),
+            key: item.to_string(),
+            content_length: Some(size),
             ..Default::default()
         };
 
+        rusoto_s3::S3::put_object(&client, req).await?;
         Ok(())
-        */
-
-        todo!();
     }
 
     async fn read_item(
         &mut self,
-        _container: &str,
-        _item: &str,
+        container: &str,
+        item: &str,
     ) -> Result<Box<dyn tokio::io::AsyncRead + Unpin + Send + Sync>> {
-        todo!();
+        let client = self.create_client()?;
+
+        let req = rusoto_s3::GetObjectRequest {
+            bucket: container.to_string(),
+            key: item.to_string(),
+            ..Default::default()
+        };
+
+        let res = rusoto_s3::S3::get_object(&client, req).await?;
+        let res = res.body.ok_or(StowError::EmptyItemError)?;
+
+        Ok(Box::new(res.into_async_read()))
     }
 
-    async fn remove_item(&mut self, _container: &str, _item: &str) -> Result<()> {
-        todo!();
+    async fn remove_item(&mut self, container: &str, item: &str) -> Result<()> {
+        let client = self.create_client()?;
+
+        let req = rusoto_s3::DeleteObjectRequest {
+            bucket: container.to_string(),
+            key: item.to_string(),
+            ..Default::default()
+        };
+
+        rusoto_s3::S3::delete_object(&client, req).await?;
+        Ok(())
     }
 }

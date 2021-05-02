@@ -15,11 +15,11 @@ pub trait Adapter: Clone {
     async fn remove_container(&mut self, container: &str) -> Result<()>;
 
     async fn items(&mut self, container: &str) -> Result<Vec<String>>;
-    async fn create_item<'a>(
+    async fn create_item(
         &mut self,
         container: &str,
         item: &str,
-        reader: (impl 'a + tokio::io::AsyncRead + Unpin + Send + Sync),
+        reader: (impl tokio::io::AsyncRead + Unpin + Send + Sync + 'static),
     ) -> Result<()>;
     async fn read_item(
         &mut self,
@@ -92,7 +92,7 @@ impl Location {
         &mut self,
         container: &str,
         item: &str,
-        reader: (impl tokio::io::AsyncRead + Unpin + Send + Sync),
+        reader: (impl tokio::io::AsyncRead + Unpin + Send + Sync + 'static),
     ) -> Result<()> {
         let container = util::streamline(container);
 

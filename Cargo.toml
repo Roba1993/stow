@@ -17,7 +17,6 @@ version = "0.3.0"
 [dependencies]
 async-trait = "0.1.48"
 #google-cloud = {version = "0.2.1", features = ["storage"]} // lets wait for the merge
-bytes = "1.0.1"
 futures = "0.3.14"
 google-cloud = {features = ["storage"], git = "https://github.com/Roba1993/google-cloud-rs", branch = "list-objects"}
 regex = "1"

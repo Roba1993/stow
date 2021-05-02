@@ -71,11 +71,11 @@ impl Adapter for LocalLocation {
         Ok(containers)
     }
 
-    async fn create_item<'a>(
+    async fn create_item(
         &mut self,
         container: &str,
         item: &str,
-        mut reader: impl 'a + tokio::io::AsyncRead + Unpin + Send,
+        mut reader: impl tokio::io::AsyncRead + Unpin + Send + 'static,
     ) -> Result<()> {
         let item = util::streamline_item(item)?;
 

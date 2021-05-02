@@ -23,6 +23,24 @@ pub enum StowError {
     #[error("Rusoto list bucket error")]
     RusotoListBucketError(#[from] rusoto_core::RusotoError<rusoto_s3::ListBucketsError>),
 
+    #[error("Rusoto put object error")]
+    RusotoPutObjectError(#[from] rusoto_core::RusotoError<rusoto_s3::PutObjectError>),
+
+    #[error("Rusoto list objects error")]
+    RusotoListObjectsError(#[from] rusoto_core::RusotoError<rusoto_s3::ListObjectsV2Error>),
+
+    #[error("Rusoto get object error")]
+    RusotoGetObjectError(#[from] rusoto_core::RusotoError<rusoto_s3::GetObjectError>),
+
+    #[error("Rusoto delete object error")]
+    RusotoDeleteObjectError(#[from] rusoto_core::RusotoError<rusoto_s3::DeleteObjectError>),
+
+    #[error("Rusoto delete bucket error")]
+    RusotoDeleteBucketError(#[from] rusoto_core::RusotoError<rusoto_s3::DeleteBucketError>),
+
+    #[error("Rusoto empty item error")]
+    EmptyItemError,
+
     #[error("The Item name need a item/file type")]
     ItemTypMissing,
 

@@ -1,4 +1,4 @@
-//use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 #[tokio::test]
 async fn test_s3() -> stow::Result<()> {
@@ -30,21 +30,11 @@ async fn test_s3() -> stow::Result<()> {
         .await?
         .contains(&String::from(&container_2)));
 
-    /*
-
     // create two test.txt file
-    aws3.create_item(
-        &container_1,
-        "test.txt",
-        &mut reader("Hello World 1").await?,
-    )
-    .await?;
-    aws3.create_item(
-        &container_2,
-        "test.txt",
-        &mut reader("Hello World 2").await?,
-    )
-    .await?;
+    aws3.create_item(&container_1, "test.txt", reader("Hello World 1").await?)
+        .await?;
+    aws3.create_item(&container_2, "test.txt", reader("Hello World 2").await?)
+        .await?;
 
     assert!(aws3
         .items(&container_2)
@@ -52,12 +42,8 @@ async fn test_s3() -> stow::Result<()> {
         .contains(&String::from("test.txt")));
 
     // rewrite the test.txt file
-    aws3.create_item(
-        &container_1,
-        "test.txt",
-        &mut reader("Hello World 1 New").await?,
-    )
-    .await?;
+    aws3.create_item(&container_1, "test.txt", reader("Hello World 1 New").await?)
+        .await?;
 
     // read the test.txt file
     let mut buf = vec![];
@@ -70,17 +56,20 @@ async fn test_s3() -> stow::Result<()> {
     // remove the item.txt in container 2
     aws3.remove_item(&container_2, "test.txt").await?;
     assert!(aws3.read_item(&container_2, "test.txt").await.is_err());
-
-    println!("delete");
-
-    // remove the container
+    // remove the container 2
     aws3.remove_container(&container_2).await?;
 
     // remove the item.txt in container 1
     aws3.remove_item(&container_1, "test.txt").await?;
     assert!(aws3.read_item(&container_1, "test.txt").await.is_err());
     aws3.remove_container(&container_1).await?;
-    */
 
     Ok(())
+}
+
+async fn reader(data: &str) -> stow::Result<tokio::io::DuplexStream> {
+    let (mut send, recv) = tokio::io::duplex(data.len());
+    send.write_all(data.as_bytes()).await?;
+    send.shutdown().await?;
+    Ok(recv)
 }

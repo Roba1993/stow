@@ -6,7 +6,7 @@ Cloud storage abstraction package for Rust
 Supported endpoints:
 * Local (folders are containers, files are items)
 * Google Cloud Storage
-* Amazon S3 Storage (WIP)
+* Amazon S3 Storage
 
 Additional endpoints can be added if needed.
 

@@ -54,11 +54,11 @@ impl Adapter for Gcs {
             .collect())
     }
 
-    async fn create_item<'a>(
+    async fn create_item(
         &mut self,
         container: &str,
         item: &str,
-        mut reader: impl 'a + tokio::io::AsyncRead + Unpin + Send,
+        mut reader: impl tokio::io::AsyncRead + Unpin + Send + 'static,
     ) -> Result<()> {
         use tokio::io::AsyncReadExt;
 

@@ -31,18 +31,10 @@ async fn test_gcs() -> stow::Result<()> {
         .contains(&String::from(&container_2)));
 
     // create two test.txt file
-    gcs.create_item(
-        &container_1,
-        "test.txt",
-        &mut reader("Hello World 1").await?,
-    )
-    .await?;
-    gcs.create_item(
-        &container_2,
-        "test.txt",
-        &mut reader("Hello World 2").await?,
-    )
-    .await?;
+    gcs.create_item(&container_1, "test.txt", reader("Hello World 1").await?)
+        .await?;
+    gcs.create_item(&container_2, "test.txt", reader("Hello World 2").await?)
+        .await?;
 
     assert!(gcs
         .items(&container_2)
@@ -50,12 +42,8 @@ async fn test_gcs() -> stow::Result<()> {
         .contains(&String::from("test.txt")));
 
     // rewrite the test.txt file
-    gcs.create_item(
-        &container_1,
-        "test.txt",
-        &mut reader("Hello World 1 New").await?,
-    )
-    .await?;
+    gcs.create_item(&container_1, "test.txt", reader("Hello World 1 New").await?)
+        .await?;
 
     // read the test.txt file
     let mut buf = vec![];
@@ -68,8 +56,6 @@ async fn test_gcs() -> stow::Result<()> {
     // remove the item.txt in container 2
     gcs.remove_item(&container_2, "test.txt").await?;
     assert!(gcs.read_item(&container_2, "test.txt").await.is_err());
-
-    println!("delete");
 
     // remove the container
     gcs.remove_container(&container_2).await?;

@@ -22,10 +22,10 @@ async fn test_local() -> stow::Result<()> {
 
     // create two test.txt file
     local
-        .create_item(container_1, "test.txt", &mut reader("Hello World 1").await?)
+        .create_item(container_1, "test.txt", reader("Hello World 1").await?)
         .await?;
     local
-        .create_item(container_2, "test.txt", &mut reader("Hello World 2").await?)
+        .create_item(container_2, "test.txt", reader("Hello World 2").await?)
         .await?;
     assert!(local
         .items(container_2)
@@ -34,11 +34,7 @@ async fn test_local() -> stow::Result<()> {
 
     // rewrite the test.txt file
     local
-        .create_item(
-            container_1,
-            "test.txt",
-            &mut reader("Hello World 1 New").await?,
-        )
+        .create_item(container_1, "test.txt", reader("Hello World 1 New").await?)
         .await?;
 
     // read the test.txt file
