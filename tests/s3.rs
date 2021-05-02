@@ -21,7 +21,6 @@ async fn test_s3() -> stow::Result<()> {
     aws3.create_container(&container_1).await?;
     aws3.create_container(&container_2).await?;
 
-    /*
     assert!(aws3
         .containers()
         .await?
@@ -30,6 +29,8 @@ async fn test_s3() -> stow::Result<()> {
         .containers()
         .await?
         .contains(&String::from(&container_2)));
+
+    /*
 
     // create two test.txt file
     aws3.create_item(

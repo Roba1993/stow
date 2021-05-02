@@ -62,7 +62,6 @@ impl Adapter for Gcs {
     ) -> Result<()> {
         use tokio::io::AsyncReadExt;
 
-        let container = util::streamline(container);
         let item = util::streamline_item(item)?;
 
         let mut bucket = self.client.bucket(&container).await?;

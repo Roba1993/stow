@@ -17,6 +17,8 @@ version = "0.3.0"
 [dependencies]
 async-trait = "0.1.48"
 #google-cloud = {version = "0.2.1", features = ["storage"]} // lets wait for the merge
+bytes = "1.0.1"
+futures = "0.3.14"
 google-cloud = {features = ["storage"], git = "https://github.com/Roba1993/google-cloud-rs", branch = "list-objects"}
 regex = "1"
 rusoto_core = "0.46.0"
@@ -25,6 +27,7 @@ rusoto_s3 = "0.46.0"
 rusoto_signature = "0.46.0"
 thiserror = "1"
 tokio = {version = "1", features = ["fs", "io-util", "rt", "macros"]}
+tokio-util = {version = "0.6.5", features = ["compat"]}
 
 [dev-dependencies]
 dotenv = "0.15.0"

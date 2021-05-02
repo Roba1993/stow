@@ -20,11 +20,17 @@ pub enum StowError {
     #[error("Rusoto TLS error")]
     RusotoTlsError(#[from] rusoto_core::request::TlsError),
 
+    #[error("Rusoto list bucket error")]
+    RusotoListBucketError(#[from] rusoto_core::RusotoError<rusoto_s3::ListBucketsError>),
+
     #[error("The Item name need a item/file type")]
     ItemTypMissing,
 
     #[error("The Container cloud not be created")]
     ContainerCreationError,
+
+    #[error("Listing of the containers failed")]
+    ListContainerError,
 
     #[error("Unknown stow error")]
     Unknown,

@@ -19,7 +19,7 @@ pub trait Adapter: Clone {
         &mut self,
         container: &str,
         item: &str,
-        reader: (impl 'a + tokio::io::AsyncRead + Unpin + Send),
+        reader: (impl 'a + tokio::io::AsyncRead + Unpin + Send + Sync),
     ) -> Result<()>;
     async fn read_item(
         &mut self,
@@ -92,12 +92,14 @@ impl Location {
         &mut self,
         container: &str,
         item: &str,
-        reader: (impl tokio::io::AsyncRead + Unpin + Send),
+        reader: (impl tokio::io::AsyncRead + Unpin + Send + Sync),
     ) -> Result<()> {
+        let container = util::streamline(container);
+
         match self {
-            Location::Local(l) => l.create_item(container, item, reader).await,
-            Location::Gcs(l) => l.create_item(container, item, reader).await,
-            Location::S3(l) => l.create_item(container, item, reader).await,
+            Location::Local(l) => l.create_item(&container, item, reader).await,
+            Location::Gcs(l) => l.create_item(&container, item, reader).await,
+            Location::S3(l) => l.create_item(&container, item, reader).await,
         }
     }
 

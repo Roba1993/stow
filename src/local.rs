@@ -77,7 +77,6 @@ impl Adapter for LocalLocation {
         item: &str,
         mut reader: impl 'a + tokio::io::AsyncRead + Unpin + Send,
     ) -> Result<()> {
-        let container = util::streamline(container);
         let item = util::streamline_item(item)?;
 
         let mut path = String::from(&self.path);
